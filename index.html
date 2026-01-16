@@ -20,6 +20,17 @@
         <style>
             .entry-meta, .entry-footer { display: none !important; }
             img:is([sizes="auto" i], [sizes^="auto," i]) { contain-intrinsic-size: 3000px 1500px }
+            #sticky-header {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 1000;
+                background: #fff;
+            }
+            #site-content-contain {
+                padding-top: 83px;
+            }
         </style>
         <script src="https://forums.intercede.com/wp-includes/js/jquery/jquery.min.js"></script>
     </head>
