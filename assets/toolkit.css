@@ -1,0 +1,8 @@
+.entry-meta,
+.entry-footer {
+  display: none !important;
+}
+
+img:is([sizes="auto" i], [sizes^="auto," i]) {
+  contain-intrinsic-size: 3000px 1500px;
+}
