@@ -1,0 +1,232 @@
+/*
+Theme Name: Idyllic Child
+Theme URL: http://intercede.com
+Description: Twenty Seventeen Child Theme
+Author: John Doe
+Author URL: http://intercede.com
+Template: Idyllic
+Version: 1.0.0
+Text Domain: Idyllic-child
+*/
+
+body {
+  font-family: Montserrat, Arimo, sans-serif;
+}
+
+a {
+	color: #FF8500;
+}
+
+#content {
+    padding: 50px 0 0;
+}
+
+p {
+	 margin: 0 0 10px 0;
+}
+
+table {
+	border: none;
+}
+
+td {
+	border: none;
+}
+
+.is-sticky .main-header {
+	background: #fff;
+}
+
+.main-navigation ul li.current-menu-item a {
+	color: #FF8500 !important;
+}
+
+.main-navigation a:hover {
+	color: #FF8500 !important;
+
+}
+
+
+#primary {
+    float: unset;
+    width: 100%;
+	 margin: auto;
+}
+
+#site-title a {
+  font-family: Montserrat, Arimo, sans-serif;
+	font-weight: 500;
+}
+
+#colophon .widget-area {
+	padding: 20px 0 0;
+	background: #ccc;
+}
+#colophon {
+	line-height:  0.8;;
+}
+
+#colophon p {
+    margin-bottom: 10px;
+}
+
+#colophon .widget-wrap {
+	border: none;
+}
+
+#colophon .column-4 {
+	margin-bottom: 0;
+	text-align: center;
+}
+
+.site-info {
+    padding: 10px 0 20px;
+}
+
+input[type="reset"], input[type="button"], input[type="submit"] {
+	background-color: #FF8500;
+}
+
+div.bbp-template-notice, div.indicator-hint {
+    color: #f85;
+}
+
+.bbp-submit-wrapper button.submit { 
+	background-color: #FF8500;
+	border: 1px solid #FF8500;
+}
+
+#site-detail {
+	padding: 8px;
+}
+
+#site-branding {
+	margin-top: 4px;
+}
+
+#bbpress-forums li.bbp-header {
+	padding: 2px;
+}
+
+#bbpress-forums li.bbp-body ul.topic {
+   padding: 8px 8px 0 8px;
+}
+
+#bbpress-forums ul.bbp-topics {
+   margin-bottom: 0;
+}
+
+#bbpress-forums li.bbp-footer {
+    padding: 8px;
+}
+
+#bbpress-forums p.bbp-topic-meta {
+    font-size: 10px;
+    margin: 0;
+}
+
+li.bbp-topic-freshness {
+	font-size: 12px;
+}
+
+li.bbp-topic-voice-count {
+	font-size: 12px;
+}
+
+li.bbp-topic-reply-count {
+	font-size: 12px;
+}
+
+.bbp-pagination-count {
+    font-size: 12px;
+}
+	
+.page-header {
+	padding: 0;
+}
+
+.main-navigation a:hover, .main-navigation ul li.current-menu-item a, .main-navigation ul li.current_page_ancestor a, .main-navigation ul li.current-menu-ancestor a, .main-navigation ul li.current_page_item a, .main-navigation ul li:hover > a, .main-navigation li.current-menu-ancestor.menu-item-has-children > a:after, .main-navigation li.current-menu-item.menu-item-has-children > a:after, .main-navigation ul li:hover > a:after, .main-navigation li.menu-item-has-children > a:hover:after, .main-navigation li.page_item_has_children > a:hover:after {
+    color: #FF8500;
+}
+
+
+div#jsst-header {
+    background-color: #C8C8C8 !important;
+}
+
+div.bbp-template-notice {
+		padding : 5px;
+
+}
+
+.subscription-toggle{
+	padding: 5px;
+}
+
+div.js-ticket-frontend-manu-circle-inner1 {
+	background-color: #8a8a8a;
+}
+div.js-ticket-frontend-manu-circle-inner2 {
+	background-color: #8a8a8a;
+}
+div.js-ticket-frontend-manu-circle-inner3 {
+	background-color: #8a8a8a;
+}
+div.js-ticket-frontend-manu-circle-inner4 {
+	background-color: #8a8a8a;
+}
+div.js-ticket-frontend-manu-circle-inner5 {
+	background-color: #8a8a8a;
+}
+div.js-ticket-frontend-manu-circle-inner6 {
+	background-color: #8a8a8a;
+}
+div.js-ticket-frontend-manu-circle-inner7 {
+	background-color: #8a8a8a;
+}
+div.js-ticket-frontend-manu-circle-inner8 {
+	background-color: #8a8a8a;
+}
+
+a.js-ticket-frontend-manu:hover {
+    background-color: #FB7;
+}
+
+div#jsst-header span.jsst-header-tab.active a {
+	background: #FB7;
+}
+
+div#jsst-header {
+    border-bottom: 4px solid #FB7;
+}
+
+.go-to-top .icon-bg {
+	background-color: #FB7;
+}
+
+span.tk_attachments_addform {
+	background: #FB7;
+}
+
+input[type="reset"], input[type="button"], input[type="submit"] {
+    background-color: #FB7;
+}
+
+div.js-myticket-link a.js-myticket-link.active {
+    color: #ffffff;
+    background: #666;
+}
+
+div.js-ticket-sorting span.js-ticket-sorting-link a.selected, div.js-ticket-sorting span.js-ticket-sorting-link a:hover {
+    background: #666;
+}
+
+.site-info {
+	display: none;
+}
+
+
+
+
+
+
