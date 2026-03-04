@@ -48,18 +48,18 @@
 <p>Allows custom web-pages to be integrated into MyID Self-Service Kiosk, exposing native functionality for those pages to use.</p>
 <h2 id="table-of-contents">Table of Contents</h2>
 <ul>
-<li><a href="SSK&#32;WebAPI.html#pre-requisites">Pre-requisites</a></li>
-<li><a href="SSK&#32;WebAPI.html#developer-notes">Developer Notes</a>
+<li><a href="#pre-requisites">Pre-requisites</a></li>
+<li><a href="#developer-notes">Developer Notes</a>
 <ul>
-<li><a href="SSK&#32;WebAPI.html#accessing-the-api">Accessing the API</a></li>
-<li><a href="SSK&#32;WebAPI.html#debugging">Debugging</a></li>
+<li><a href="#accessing-the-api">Accessing the API</a></li>
+<li><a href="#debugging">Debugging</a></li>
 </ul>
 </li>
-<li><a href="SSK&#32;WebAPI.html#web-api">Web API</a>
+<li><a href="#web-api">Web API</a>
 <ul>
-<li><a href="SSK&#32;WebAPI.html#fingerprint-capture">Fingerprint Capture</a></li>
-<li><a href="SSK&#32;WebAPI.html#done">Done</a></li>
-<li><a href="SSK&#32;WebAPI.html#kiosk-id">Kiosk ID</a></li>
+<li><a href="#fingerprint-capture">Fingerprint Capture</a></li>
+<li><a href="#done">Done</a></li>
+<li><a href="#kiosk-id">Kiosk ID</a></li>
 </ul>
 </li>
 </ul>
@@ -76,7 +76,7 @@
 </ul>
 <p>Some parts of the API require additional client-configuration:</p>
 <ul>
-<li><a href="SSK&#32;WebAPI.html#fingerprint-capture">Fingerprint Capture</a> requires that your client be configured as-per the <em>Biometrics</em> section of the MyID documentation (e.g. <em>MyID BioPack</em> and support patch corresponding to your fingerprint reader(s) should be installed).</li>
+<li><a href="#fingerprint-capture">Fingerprint Capture</a> requires that your client be configured as-per the <em>Biometrics</em> section of the MyID documentation (e.g. <em>MyID BioPack</em> and support patch corresponding to your fingerprint reader(s) should be installed).</li>
 </ul>
 <h1 id="developer-notes">Developer Notes</h1>
 <h2 id="accessing-the-api">Accessing the API</h2>
@@ -85,9 +85,9 @@
 </div></code></pre>
 <p>This object exposes a number of functions and properties that can be called from the embedded page:</p>
 <ul>
-<li><a href="SSK&#32;WebAPI.html#fingerprint-capture">CaptureFingerprints(string, string, func(string))</a></li>
-<li><a href="SSK&#32;WebAPI.html#done">Done(string)</a></li>
-<li><a href="SSK&#32;WebAPI.html#kiosk-id">KioskID</a></li>
+<li><a href="#fingerprint-capture">CaptureFingerprints(string, string, func(string))</a></li>
+<li><a href="#done">Done(string)</a></li>
+<li><a href="#kiosk-id">KioskID</a></li>
 </ul>
 <h2 id="debugging">Debugging</h2>
 <p>SSK can be configured to enable the <a href="https://docs.microsoft.com/en-us/microsoft-edge/devtools-guide-chromium/">Microsoft Edge Developer Tools</a>, allowing you to debug your custom pages within the SSK window. To enable these tools, add the following to your <em>MyIDKiosk.exe.config</em> file (located in the SSK install directory) inside the <em>appSettings</em> node:</p>
@@ -116,13 +116,13 @@
 <td>fingersToCapture</td>
 <td>string</td>
 <td>Fingers to be captured</td>
-<td>Semi-colon delimited string of <a href="SSK&#32;WebAPI.html#finger-ids">Finger IDs</a> (case-insensitive)</td>
+<td>Semi-colon delimited string of <a href="#finger-ids">Finger IDs</a> (case-insensitive)</td>
 </tr>
 <tr>
 <td>captureDeviceType</td>
 <td>string</td>
 <td>Fingerprint capture device-type</td>
-<td>One of the supported <a href="SSK&#32;WebAPI.html#fingerprint-capture-device-types">fingerprint capture device-types</a> (case insensitive)</td>
+<td>One of the supported <a href="#fingerprint-capture-device-types">fingerprint capture device-types</a> (case insensitive)</td>
 </tr>
 <tr>
 <td>callbackFunc</td>
@@ -288,7 +288,7 @@
 <td>doneReason</td>
 <td>string</td>
 <td>The reason for progressing</td>
-<td>One of the supported <a href="SSK&#32;WebAPI.html#done-reasons">done reasons</a> (case-insensitive)</td>
+<td>One of the supported <a href="#done-reasons">done reasons</a> (case-insensitive)</td>
 </tr>
 </tbody>
 </table>
