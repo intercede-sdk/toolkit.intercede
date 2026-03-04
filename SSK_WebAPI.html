@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="UTF-8">
+        <title>SSK Web API</title>
+        <style>
+/* From extension vscode.github */
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.vscode-dark img[src$=\#gh-light-mode-only],
+.vscode-light img[src$=\#gh-dark-mode-only] {
+	display: none;
+}
+
+
+/*---------------------------------------------------------------------------------------------
+ *  Copyright (c) Microsoft Corporation. All rights reserved.
+ *  Licensed under the MIT License. See License.txt in the project root for license information.
+ *--------------------------------------------------------------------------------------------*/
+
+.katex-error {
+	color: var(--vscode-editorError-foreground);
+}
+
+</style>
+        
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+<style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', system-ui, 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        <style>
+.task-list-item { list-style-type: none; } .task-list-item-checkbox { margin-left: -20px; vertical-align: middle; }
+</style>
+        
+        
+        
+    </head>
+    <body class="vscode-body vscode-light">
+        <h1 id="ssk-web-api">SSK Web API</h1>
+<p>Allows custom web-pages to be integrated into MyID Self-Service Kiosk, exposing native functionality for those pages to use.</p>
+<h2 id="table-of-contents">Table of Contents</h2>
+<ul>
+<li><a href="SSK&#32;WebAPI.html#pre-requisites">Pre-requisites</a></li>
+<li><a href="SSK&#32;WebAPI.html#developer-notes">Developer Notes</a>
+<ul>
+<li><a href="SSK&#32;WebAPI.html#accessing-the-api">Accessing the API</a></li>
+<li><a href="SSK&#32;WebAPI.html#debugging">Debugging</a></li>
+</ul>
+</li>
+<li><a href="SSK&#32;WebAPI.html#web-api">Web API</a>
+<ul>
+<li><a href="SSK&#32;WebAPI.html#fingerprint-capture">Fingerprint Capture</a></li>
+<li><a href="SSK&#32;WebAPI.html#done">Done</a></li>
+<li><a href="SSK&#32;WebAPI.html#kiosk-id">Kiosk ID</a></li>
+</ul>
+</li>
+</ul>
+<h1 id="pre-requisites">Pre-requisites</h1>
+<p>To use this API, the following are required:</p>
+<ul>
+<li>MyID 12.2 or later</li>
+<li>MyID Self-Service Kiosk 3.11.1000.1 (SSK-3.11.1000.1) or later</li>
+<li><a href="https://developer.microsoft.com/en-us/microsoft-edge/webview2/">Microsoft Edge WebView2 Runtime</a> 95.0.1020.40 or later
+<ul>
+<li>Intercede recommends the 'Evergreen' installer, which will allow Windows to keep the underlying Microsoft Edge components up-to-date with the latest features and security patches.</li>
+</ul>
+</li>
+</ul>
+<p>Some parts of the API require additional client-configuration:</p>
+<ul>
+<li><a href="SSK&#32;WebAPI.html#fingerprint-capture">Fingerprint Capture</a> requires that your client be configured as-per the <em>Biometrics</em> section of the MyID documentation (e.g. <em>MyID BioPack</em> and support patch corresponding to your fingerprint reader(s) should be installed).</li>
+</ul>
+<h1 id="developer-notes">Developer Notes</h1>
+<h2 id="accessing-the-api">Accessing the API</h2>
+<p>SSK exposes a 'MyID' object via the WebView2's HostObjects property:</p>
+<pre><code class="language-javascript"><div><span class="hljs-built_in">window</span>.chrome.webview.hostObjects.MyID
+</div></code></pre>
+<p>This object exposes a number of functions and properties that can be called from the embedded page:</p>
+<ul>
+<li><a href="SSK&#32;WebAPI.html#fingerprint-capture">CaptureFingerprints(string, string, func(string))</a></li>
+<li><a href="SSK&#32;WebAPI.html#done">Done(string)</a></li>
+<li><a href="SSK&#32;WebAPI.html#kiosk-id">KioskID</a></li>
+</ul>
+<h2 id="debugging">Debugging</h2>
+<p>SSK can be configured to enable the <a href="https://docs.microsoft.com/en-us/microsoft-edge/devtools-guide-chromium/">Microsoft Edge Developer Tools</a>, allowing you to debug your custom pages within the SSK window. To enable these tools, add the following to your <em>MyIDKiosk.exe.config</em> file (located in the SSK install directory) inside the <em>appSettings</em> node:</p>
+<pre><code class="language-xml"><div><span class="hljs-tag">&lt;<span class="hljs-name">add</span> <span class="hljs-attr">key</span>=<span class="hljs-string">&quot;EnableWebApiDevTools&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;true&quot;</span>/&gt;</span>
+</div></code></pre>
+<p>With this configuration, from an embedded web-page in SSK you can press <em>F12</em> and the <a href="https://docs.microsoft.com/en-us/microsoft-edge/devtools-guide-chromium/">Microsoft Edge Developer Tools</a> will open in a standalone window, at which point you can debug your embedded page as-if it was running inside Microsoft Edge standalone.</p>
+<p>❗ <strong>NOTE</strong>: This configuration allows anyone with access to the kiosk to invoke the <a href="https://docs.microsoft.com/en-us/microsoft-edge/devtools-guide-chromium/">Microsoft Edge Developer Tools</a>, and should not be used in production. When this is enabled, SSK presents a red warning at the top of the window to indicate that it is configured in an insecure fashion.</p>
+<h1 id="web-api">Web API</h1>
+<p>The following details the functions and properties exposed by this version of the SSK Web API.</p>
+<h2 id="fingerprint-capture">Fingerprint Capture</h2>
+<h3 id="capturefingerprintsfingerstocapture-capturedevicetype-callbackfunc"><em>CaptureFingerprints(fingersToCapture, captureDeviceType, callbackFunc)</em></h3>
+<h3 id="description"><strong>Description</strong></h3>
+<p>Allows the embedded web-page to capture one or more fingerprints using SSK's native controls. When called, the web-page is hidden and the fingerprint capture UI is displayed; once the operator has completed the fingerprint capture the web-page is restored and the result is returned via a callback function as a JSON string in <em>MyID REST API</em> format.</p>
+<h3 id="arguments"><strong>Arguments</strong></h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Allowed values</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>fingersToCapture</td>
+<td>string</td>
+<td>Fingers to be captured</td>
+<td>Semi-colon delimited string of <a href="SSK&#32;WebAPI.html#finger-ids">Finger IDs</a> (case-insensitive)</td>
+</tr>
+<tr>
+<td>captureDeviceType</td>
+<td>string</td>
+<td>Fingerprint capture device-type</td>
+<td>One of the supported <a href="SSK&#32;WebAPI.html#fingerprint-capture-device-types">fingerprint capture device-types</a> (case insensitive)</td>
+</tr>
+<tr>
+<td>callbackFunc</td>
+<td>function</td>
+<td>JavaScript callback to which SSK will return the result.</td>
+<td>A JavaScript function that takes a single string parameter.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="finger-ids"><em>Finger IDs</em></h3>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>LT</td>
+<td>Left thumb</td>
+</tr>
+<tr>
+<td>LI</td>
+<td>Left index-finger</td>
+</tr>
+<tr>
+<td>LM</td>
+<td>Left middle-finger</td>
+</tr>
+<tr>
+<td>LR</td>
+<td>Left ring-finger</td>
+</tr>
+<tr>
+<td>LL</td>
+<td>Left little-finger</td>
+</tr>
+<tr>
+<td>RT</td>
+<td>Right thumb</td>
+</tr>
+<tr>
+<td>RI</td>
+<td>Right index-finger</td>
+</tr>
+<tr>
+<td>RM</td>
+<td>Right middle-finger</td>
+</tr>
+<tr>
+<td>RR</td>
+<td>Right ring-finger</td>
+</tr>
+<tr>
+<td>RL</td>
+<td>Right little-finger</td>
+</tr>
+</tbody>
+</table>
+<h3 id="fingerprint-capture-device-types"><em>Fingerprint Capture Device-Types</em></h3>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Secugen</td>
+<td>Capture using a <em>Secugen</em> fingerprint reader</td>
+</tr>
+<tr>
+<td>UareU</td>
+<td>Capture using a <em>UareU</em> fingerprint reader</td>
+</tr>
+</tbody>
+</table>
+<h3 id="example"><strong>Example</strong></h3>
+<p>The following shows a capture of the left and right thumbs using a Secugen fingerprint reader:</p>
+<pre><code class="language-javascript"><div><span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">processResult</span>(<span class="hljs-params">result</span>)
+</span>{
+  <span class="hljs-comment">// This will be called by SSK with the capture result</span>
+}
+
+<span class="hljs-built_in">window</span>.chrome.webview.hostObjects.MyID.CaptureFingerprints(<span class="hljs-string">&quot;lt;rt&quot;</span>, <span class="hljs-string">&quot;secugen&quot;</span>, processResult)
+</div></code></pre>
+<h3 id="callback-data-format"><em>Callback Data Format</em></h3>
+<p>The following is an example of the data that is passed into <em>callbackFunc</em> (the <em>processResult</em> function in the above example) by SSK:</p>
+<pre><code class="language-JSON"><div>{
+    <span class="hljs-attr">&quot;Fingers&quot;</span>: {
+        <span class="hljs-attr">&quot;lt&quot;</span>: {
+            <span class="hljs-attr">&quot;bioDeviceId&quot;</span>: <span class="hljs-string">&quot;{C4723C9E-828F-497F-AD2E-D15EFA17B971}&quot;</span>,
+            <span class="hljs-attr">&quot;minutia&quot;</span>: {
+                <span class="hljs-attr">&quot;format&quot;</span>: <span class="hljs-string">&quot;378&quot;</span>,
+                <span class="hljs-attr">&quot;data&quot;</span>: <span class="hljs-string">&quot;&lt;AnsiIncits378Data&gt;&quot;</span>
+            },
+            <span class="hljs-attr">&quot;quality&quot;</span>: <span class="hljs-string">&quot;90&quot;</span>,
+            <span class="hljs-attr">&quot;status&quot;</span>: <span class="hljs-string">&quot;P&quot;</span>
+        },
+        <span class="hljs-attr">&quot;rt&quot;</span>: {
+            <span class="hljs-attr">&quot;bioDeviceId&quot;</span>: <span class="hljs-string">&quot;{C4723C9E-828F-497F-AD2E-D15EFA17B971}&quot;</span>,
+            <span class="hljs-attr">&quot;minutia&quot;</span>: {
+                <span class="hljs-attr">&quot;format&quot;</span>: <span class="hljs-string">&quot;378&quot;</span>,
+                <span class="hljs-attr">&quot;data&quot;</span>: <span class="hljs-string">&quot;&lt;AnsiIncits378Data&gt;&quot;</span>
+            },
+            <span class="hljs-attr">&quot;quality&quot;</span>: <span class="hljs-string">&quot;86&quot;</span>,
+            <span class="hljs-attr">&quot;status&quot;</span>: <span class="hljs-string">&quot;P&quot;</span>
+        }
+    },
+    <span class="hljs-attr">&quot;StatusCode&quot;</span>: <span class="hljs-string">&quot;Success&quot;</span>,
+    <span class="hljs-attr">&quot;Success&quot;</span>: <span class="hljs-literal">true</span>
+}
+</div></code></pre>
+<p>In this example, the left and right thumbs have been successfully captured (actual data redacted for the purpose of this document).</p>
+<ul>
+<li>The <em>Fingers</em> property is the capture data pre-formatted for the <em>MyID REST API</em>.</li>
+<li>The <em>Success</em> property is a boolean that indicates whether or not the capture was successful (avoids the need to parse <em>StatusCode</em> in most cases). Will be <em>true</em> if <em>StatusCode</em> value is <em>Success</em>, and <em>false</em> otherwise.</li>
+<li>The <em>StatusCode</em> property gives more information on the result of the capture, and can contain one of the following values:
+<ul>
+<li>Success
+<ul>
+<li>The capture was completed successfully.</li>
+</ul>
+</li>
+<li>InvalidData
+<ul>
+<li>The data provided to the <em>CaptureFingerprints</em> function was invalid (e.g. no <em>fingersToCapture</em> specified).</li>
+</ul>
+</li>
+<li>Abort
+<ul>
+<li>The operator cancelled the capture.</li>
+</ul>
+</li>
+<li>InternalError
+<ul>
+<li>The capture failed due to an internal error - more information should be available in the SSK logs.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<hr>
+<h2 id="done">Done</h2>
+<h3 id="donedonereason"><em>Done(doneReason)</em></h3>
+<h3 id="description-1"><strong>Description</strong></h3>
+<p>A function that allows the embedded web-page to indicate to SSK that it has finished its work, and that the kiosk should progress to the next stage. The web-page can indicate the reason for progressing, i.e. successfully completed, cancelled, timed-out, or errored.</p>
+<p>When indicating a cancellation, SSK prompts the operator to confirm the cancellation - if they confirm then SSK progresses, and if they cancel then the embedded web-page is restored.</p>
+<h3 id="arguments-1"><strong>Arguments</strong></h3>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Type</th>
+<th>Description</th>
+<th>Allowed values</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>doneReason</td>
+<td>string</td>
+<td>The reason for progressing</td>
+<td>One of the supported <a href="SSK&#32;WebAPI.html#done-reasons">done reasons</a> (case-insensitive)</td>
+</tr>
+</tbody>
+</table>
+<h3 id="done-reasons"><em>Done Reasons</em></h3>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Abort</td>
+<td>Indicates a cancellation</td>
+</tr>
+<tr>
+<td>Complete</td>
+<td>Indicates success</td>
+</tr>
+<tr>
+<td>Error</td>
+<td>Indicates an error</td>
+</tr>
+<tr>
+<td>Timeout</td>
+<td>Indicates a timeout</td>
+</tr>
+</tbody>
+</table>
+<h3 id="example-1"><strong>Example</strong></h3>
+<p>The following shows an instruction to SSK that the web-page has finished its work successfully and that the kiosk can now progress:</p>
+<pre><code class="language-javascript"><div><span class="hljs-built_in">window</span>.chrome.webview.hostObjects.MyID.Done(<span class="hljs-string">&quot;complete&quot;</span>)
+</div></code></pre>
+<hr>
+<h2 id="kiosk-id">Kiosk ID</h2>
+<h3 id="string-kioskid"><em>string KioskID</em></h3>
+<h3 id="description-2"><strong>Description</strong></h3>
+<p>A simple property that allows the embedded page to retrieve the configured Kiosk ID as a string.</p>
+<h3 id="example-2"><strong>Example</strong></h3>
+<p>The following shows retrieval of the Kiosk ID using the await pattern:</p>
+<pre><code class="language-javascript"><div><span class="hljs-keyword">var</span> kioskId = <span class="hljs-keyword">await</span> <span class="hljs-built_in">window</span>.chrome.webview.hostObjects.MyID.KioskID
+</div></code></pre>
+<p>In this example, assuming the following was configured in the <em>MyIDKiosk.exe.config</em> <em>appSettings</em>:</p>
+<pre><code class="language-xml"><div><span class="hljs-tag">&lt;<span class="hljs-name">add</span> <span class="hljs-attr">key</span>=<span class="hljs-string">&quot;KioskID&quot;</span> <span class="hljs-attr">value</span>=<span class="hljs-string">&quot;Kiosk1234&quot;</span>/&gt;</span>
+</div></code></pre>
+<p>...then the value of <em>kioskId</em> would be <em>&quot;Kiosk1234&quot;</em>.</p>
+<p>❗ <strong>NOTE</strong>: If no value has been configured in the <em>MyIDKiosk.exe.config</em> then SSK will return <em>&quot;NotSet&quot;</em>.</p>
+<hr>
+<div style="text-align: right"><i>© Intercede 2022, all rights reserved.</i></div>
+    </body>
+    </html>
