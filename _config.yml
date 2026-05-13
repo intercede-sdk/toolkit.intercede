@@ -2,3 +2,4 @@ exclude:
   - README.md
   - create-swagger-folder.ps1
   - assets/template
+  - .vscode
