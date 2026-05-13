@@ -34,7 +34,7 @@ $TargetIndexPath = Join-Path -Path $TargetFolder -ChildPath 'index.html'
 Copy-Item -Path $TemplatePath -Destination $TargetIndexPath -Force
 
 $TargetSwaggerPath = Join-Path -Path $TargetFolder -ChildPath 'swagger.json'
-Copy-Item -Path $JsonFile.FullName -Destination $TargetSwaggerPath -Force
+Move-Item -Path $JsonFile.FullName -Destination $TargetSwaggerPath -Force
 
 $IndexContent = Get-Content -Path $TargetIndexPath -Raw
 $UpdatedIndexContent = $IndexContent.Replace('%name%', $FolderName)
