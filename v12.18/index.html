@@ -220,6 +220,25 @@
                                                             Clients</a></p>
                                                 </td>
                                             </tr>
+                                            <tr>
+                                                <td>
+                                                    Translate the MyID user interface into another language for
+                                                    deployment in multilingual environments
+                                                </td>
+                                                <td>
+                                                    <p>MyID stores its UI strings in <code>.resx</code> resource files.
+                                                        LlmTranslateResx is a command-line tool that translates those
+                                                        files into a target language by calling an LLM of your choice
+                                                        (Azure OpenAI, ChatGPT, or a locally-hosted model via Ollama).
+                                                        Helper scripts are provided to copy the relevant files from a
+                                                        MyID web server installation, translate them in bulk, and copy
+                                                        the results back — keeping the live server unchanged until you
+                                                        are satisfied with the output.</p>
+                                                    <p><a href="https://github.com/intercede-sdk/LlmTranslateResx"
+                                                            target="_blank" rel="noopener noreferrer">LlmTranslateResx on
+                                                            GitHub</a></p>
+                                                </td>
+                                            </tr>
                                         </tbody>
                                     </table>
                                     <p>&nbsp;</p>
