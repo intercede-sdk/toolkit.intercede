@@ -13,3 +13,63 @@ table#versions tr {
 table#versions td:first-child {
   width: 170px;
 }
+
+body.integration-diagram-open {
+  overflow: hidden;
+}
+
+.integration-diagram {
+  box-sizing: border-box;
+  width: max-content;
+  max-width: 94vw;
+  max-height: 94vh;
+  margin: auto;
+  padding: 16px;
+  border: 0;
+  border-radius: 4px;
+  background: #fff;
+  color: #222;
+}
+
+.integration-diagram::backdrop {
+  background: rgb(0 0 0 / 65%);
+}
+
+.integration-diagram-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.integration-diagram-heading h2 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.integration-diagram-close {
+  flex: 0 0 40px;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 1px solid #767676;
+  border-radius: 4px;
+  background: #fff;
+  color: #222;
+}
+
+.integration-diagram-close:focus-visible {
+  outline: 2px solid #222;
+  outline-offset: 2px;
+}
+
+.integration-diagram img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: calc(94vh - 100px);
+  margin: auto;
+  object-fit: contain;
+}
