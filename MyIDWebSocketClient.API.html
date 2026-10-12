@@ -211,13 +211,34 @@ of messages based on the workflow's logic and the user's input, for communicatin
 <p>The API provides all of the functionality available through <a href="https://docs.intercede.com/Public/CMS/Release/Latest/Enterprise/index.htm#MyID%20Client%20for%20Windows/MyID%20Client%20for%20Windows.htm?TocPath=Self-Service%2520Applications%257CMyID%2520Client%2520for%2520Windows%257C_____0">MyID Client for Windows</a>; security device issuance/updates, security phrase management, etc,
 and can be used to produce a custom user-experience for MyID workflows, and/or to directly integrate MyID workflows into another application.</p>
 <hr />
-<h2 id="beta-release">Beta Release</h2>
+<h2 id="release-notes">Release Notes</h2>
 <p>❗<strong>NOTE:</strong> This API is in beta, and may be subject to change based on feedback from early adopters. If you are interested in using the beta in production applications, or have any feedback on your experiences with it, please contact Intercede.</p>
+<ul>
+<li>Beta 1
+<ul>
+<li>Adds support for multi-tenant environments.</li>
+<li>Adds support for Integrated Windows Authentication (IWA).</li>
+<li>Adds support for file-logging.</li>
+<li>Extended deployment options.</li>
+<li>Console-logging disabled by default, and can be enabled independently of file-logging.</li>
+<li>Improved handling of unexpected WebSocket disconnections and abandoned workflows.</li>
+<li>Report as correct client in MyID audit (requires MyID 2026.2+).</li>
+<li>Provide the path to a custom configuration file as a command line argument.</li>
+<li>Other bug-fixes and enhancements.</li>
+</ul>
+</li>
+<li>Early Access Preview 1 (EAP.1)
+<ul>
+<li>First public preview</li>
+</ul>
+</li>
+</ul>
+<p>See <a href="#11-known-issues">§11</a> for details of known issues in this release.</p>
 <h2 id="contents">Contents</h2>
 <ul>
 <li><a href="#myid-websocket-client-api">MyID WebSocket Client API</a>
 <ul>
-<li><a href="#beta-release">Beta Release</a></li>
+<li><a href="#release-notes">Release Notes</a></li>
 <li><a href="#contents">Contents</a></li>
 <li><a href="#1-deployment">1. Deployment</a>
 <ul>
@@ -228,7 +249,13 @@ and can be used to produce a custom user-experience for MyID workflows, and/or t
 <li><a href="#2-configuration">2. Configuration</a>
 <ul>
 <li><a href="#21-websocket-client-configuration-keys">2.1 WebSocket Client Configuration Keys</a></li>
-<li><a href="#22-logging">2.2 Logging</a></li>
+<li><a href="#22-logging">2.2 Logging</a>
+<ul>
+<li><a href="#221-rolling-logs">2.2.1 Rolling Logs</a></li>
+<li><a href="#222-console-logging">2.2.2 Console Logging</a></li>
+<li><a href="#223-just-in-time-error-reports">2.2.3 Just-in-Time Error Reports</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li><a href="#3-connection">3. Connection</a>
@@ -280,6 +307,7 @@ and can be used to produce a custom user-experience for MyID workflows, and/or t
 <li><a href="#8-well-known-action-keys">8. Well-Known Action Keys</a></li>
 <li><a href="#9-error-codes">9. Error Codes</a></li>
 <li><a href="#10-example">10. Example</a></li>
+<li><a href="#11-known-issues">11. Known Issues</a></li>
 </ul>
 </li>
 </ul>
@@ -455,6 +483,12 @@ and the WebSocket API. If the configuration file is not present, the WebSocket A
 <td>How long the server waits for a WebSocket <code>Pong</code> reply before treating the consumer as gone and abandoning any in-flight workflow. See <a href="#31-connection-liveness">§3.1</a>. Values of <code>0</code> or below fall back to the default.</td>
 <td><code>60</code></td>
 <td><code>&lt;add key=&quot;WS-KeepAliveTimeoutSeconds&quot; value=&quot;120&quot; /&gt;</code></td>
+</tr>
+<tr>
+<td><code>WS-DefaultServer</code></td>
+<td>When using the Switch Server feature, specifies which server to use when no server address is provided alongside a request to start a workflow. If unset, the first entry in <code>AllowedServers</code> will be used instead. If <code>AllowedServers</code> is also unset, workflow requests withtout a server explicitly specified will be rejected.</td>
+<td>(empty; no default server)</td>
+<td><code>&lt;add key=&quot;WS-DefaultServer&quot; value=&quot;https://myid.example.com&quot; /&gt;</code></td>
 </tr>
 </tbody>
 </table>
@@ -1274,6 +1308,7 @@ potentially absent.</p>
 }
 </code></pre>
 <h3 id="showidpauthview"><code>ShowIDPAuthView</code></h3>
+<p>❗ <strong>WARNING</strong>: This stage is disabled by default. See <a href="#11-known-issues">§11 (Known Issues)</a>.</p>
 <p>External identity-provider login.</p>
 <p>Incoming stage:</p>
 <pre><code class="language-json">{
@@ -1689,6 +1724,30 @@ function reply(stage, action, payload, correlationId) {
 <li><code>ActionError</code> leaves the stage active; resend a corrected reply.</li>
 <li><code>WorkflowComplete</code> is the only terminal signal for a workflow.</li>
 </ul>
+<hr />
+<h2 id="11-known-issues">11. Known Issues</h2>
+<h3 id="disconnecting-during-an-open-dialog-may-produce-an-erroneous-response">Disconnecting during an open dialog may produce an erroneous response</h3>
+<p>When a consumer disconnects while a dialog or prompt is open, every dialog still
+awaiting a reply is cancelled so that the client is never left blocked. A cancelled
+dialog cannot report a real user choice, so it resolves to a negative/default
+response rather than &quot;no answer&quot;.</p>
+<p>For most workflows this is harmless: the disconnect has already ended the session and
+the response is discarded. However, for a workflow stage that was mid-way through an
+operation started before the disconnect - FIDO registration being the clearest example -
+the negative response is currently indistinguishable from a genuine cancellation,
+and so operations may be audited as having been declined rather than aborted.</p>
+<h3 id="showidpauthview-is-disabled-by-default"><code>ShowIDPAuthView</code> is disabled by default</h3>
+<p><code>ShowIDPAuthView</code> uses the standard OAuth browser flow to perform authentication with an
+external identity provider. This stage is disabled by default because it currently requires the
+client to handle the OAuth callback on the <code>myidssa://</code> protocol, which is the protocol handled by
+<a href="https://docs.intercede.com/Public/CMS/Release/Latest/Enterprise/index.htm#MyID%20Client%20for%20Windows/MyID%20Client%20for%20Windows.htm?TocPath=Self-Service%2520Applications%257CMyID%2520Client%2520for%2520Windows%257C_____0">MyID Client for Windows</a> -
+registering both clients for the same protocol will cause Windows to prompt the end user as to which
+should handle the request, and the user can easily select the wrong one (and make Windows remember
+their incorrect selection, breaking future use without intervention).</p>
+<p>If a workflow presents a <code>ShowIDPAuthView</code> stage, the client will attempt to skip to the next authentication
+mechanism, or it will abort the workflow.</p>
+<p><code>ShowIDPAuthView</code> will be fully supported in a future release of the MyID WebSocket Client, but, if
+you need to use this stage before then, please contact Intercede.</p>
 <hr />
 <div style="text-align: right"><i>© Intercede 2026, all rights reserved.</i></div>
 
